@@ -232,6 +232,7 @@ Or install Tesseract OCR:
 ```bash
 pip install pytesseract
 # Also install Tesseract binary from: https://github.com/tesseract-ocr/tesseract
+```
 
 ## Model Information
 
