@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Detection - Smart Intrusion Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .video-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .video-section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .video-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #424242 0%, #212121 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #757575 0%, #616161 100%);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(117, 117, 117, 0.4);
+        }
+        
+        .stats-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .stat-card.vehicle {
+            border-top: 4px solid #ffc107;
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .stat-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-count {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffc107;
+        }
+        
+        .stat-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.active {
+            background: #ffc107;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .vehicle-types {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .vehicle-types-title {
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .vehicle-tag {
+            display: inline-block;
+            background: #fff8e1;
+            color: #e65100;
+            padding: 5px 12px;
+            border-radius: 15px;
+            margin: 5px 5px 0 0;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .alert-banner {
+            background: #ff9800;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            display: none;
+            animation: shake 0.5s;
+        }
+        
+        .alert-banner.show {
+            display: block;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="close-btn" onclick="window.close()">✕ Close</button>
+            <h1>🚗 Vehicle Detection System</h1>
+            <p>Real-time Vehicle Detection and Classification</p>
+        </div>
+        
+        <div class="alert-banner" id="alertBanner">
+            ⚠️ VEHICLE DETECTED! Vehicle detected in monitored area.
+        </div>
+        
+        <div class="main-content">
+            <div class="video-section">
+                <h2>Live Vehicle Detection Feed</h2>
+                <div class="video-container">
+                    <img src="{{ url_for('vehicle_video_feed') }}" alt="Vehicle Detection Feed" id="videoFeed">
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startDetection()">▶ Start Detection</button>
+                    <button class="btn btn-danger" onclick="stopDetection()">⏹ Stop Detection</button>
+                    <button class="btn btn-secondary" onclick="resetStats()">🔄 Reset Stats</button>
+                </div>
+            </div>
+            
+            <div class="stats-section">
+                <div class="stat-card vehicle">
+                    <div class="stat-header">
+                        <span class="stat-title">🚗 Vehicle Detection</span>
+                        <span class="stat-count" id="vehicleCount">0</span>
+                    </div>
+                    <div class="stat-details">
+                        <span class="status-indicator" id="vehicleIndicator"></span>
+                        <span id="vehicleStatus">No vehicles detected</span>
+                    </div>
+                    <div class="vehicle-types">
+                        <div class="vehicle-types-title">Detected Vehicles:</div>
+                        <div id="vehicleTypes">None</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let updateInterval;
+        
+        function updateStats() {
+            fetch('/vehicle_stats')
+                .then(response => response.json())
+                .then(data => {
+                    // Update vehicle detection stats
+                    document.getElementById('vehicleCount').textContent = data.vehicle.count || 0;
+                    const vehicleDetected = data.vehicle.detected || false;
+                    const vehicleIndicator = document.getElementById('vehicleIndicator');
+                    const vehicleStatus = document.getElementById('vehicleStatus');
+                    const alertBanner = document.getElementById('alertBanner');
+                    const vehicleTypesDiv = document.getElementById('vehicleTypes');
+                    
+                    if (vehicleDetected) {
+                        vehicleIndicator.classList.add('active');
+                        vehicleStatus.textContent = 'Vehicle detected!';
+                        alertBanner.classList.add('show');
+                        
+                        // Display detected vehicle types
+                        if (data.vehicle.types && data.vehicle.types.length > 0) {
+                            vehicleTypesDiv.innerHTML = data.vehicle.types.map(type => 
+                                `<span class="vehicle-tag">${type}</span>`
+                            ).join('');
+                        } else {
+                            vehicleTypesDiv.textContent = 'Unknown vehicle';
+                        }
+                    } else {
+                        vehicleIndicator.classList.remove('active');
+                        vehicleStatus.textContent = 'No vehicles detected';
+                        alertBanner.classList.remove('show');
+                        vehicleTypesDiv.textContent = 'None';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching stats:', error);
+                });
+        }
+        
+        function startDetection() {
+            fetch('/vehicle_start')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Detection started:', data);
+                    if (!updateInterval) {
+                        updateInterval = setInterval(updateStats, 500);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error starting detection:', error);
+                });
+        }
+        
+        function stopDetection() {
+            fetch('/vehicle_stop')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Detection stopped:', data);
+                    if (updateInterval) {
+                        clearInterval(updateInterval);
+                        updateInterval = null;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error stopping detection:', error);
+                });
+        }
+        
+        function resetStats() {
+            fetch('/vehicle_reset')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Stats reset:', data);
+                    updateStats();
+                })
+                .catch(error => {
+                    console.error('Error resetting stats:', error);
+                });
+        }
+        
+        // Start updating stats automatically
+        startDetection();
+        updateInterval = setInterval(updateStats, 500);
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+            stopDetection();
+        });
+    </script>
+</body>
+</html>

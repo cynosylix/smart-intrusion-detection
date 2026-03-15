@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Intrusion Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header-left h1 {
+            font-size: 2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+        
+        .header-left p {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .dashboard-card.feature-card {
+            border-top: 4px solid #667eea;
+        }
+        
+        .dashboard-card.feature-card.fire {
+            border-top-color: #f44336;
+        }
+        
+        .dashboard-card.feature-card.weapon {
+            border-top-color: #ff9800;
+        }
+        
+        .dashboard-card.feature-card.human {
+            border-top-color: #4CAF50;
+        }
+        
+        .dashboard-card.feature-card.animal {
+            border-top-color: #00bcd4;
+        }
+        
+        .dashboard-card.feature-card.vehicle {
+            border-top-color: #ffc107;
+        }
+        
+        .dashboard-card.feature-card.plate {
+            border-top-color: #9c27b0;
+        }
+        
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .card-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .card-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .card-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .main-action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .main-action-card h2 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+        
+        .main-action-card p {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        
+        .btn-primary-large {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary-large:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .stats-overview {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stats-overview h3 {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
+        }
+        
+        .stats-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .stat-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.85em;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header-right {
+                margin-top: 15px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🛡️ Smart Intrusion Detection System</h1>
+                <p>Welcome back, {{ username }}!</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span>👤 {{ username }}</span>
+                </div>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+        
+        <div class="main-action-card">
+            <h2>🚀 Start Detection</h2>
+            <p>Access the unified detection interface with all detection systems running simultaneously</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ url_for('detection') }}" class="btn-primary-large">Go to Detection Center →</a>
+                <a href="{{ url_for('video_upload') }}" class="btn-primary-large">📹 Upload Video →</a>
+                <a href="{{ url_for('history') }}" class="btn-primary-large">📜 View History →</a>
+            </div>
+        </div>
+        
+        <div class="main-action-card" style="margin-bottom: 30px;">
+            <h2 style="font-size: 2em; margin-bottom: 15px;">👤 Face Recognition</h2>
+            <p style="color: #666; font-size: 1.1em; margin-bottom: 25px;">Collect live face images from your webcam for recognition</p>
+            
+            <div style="background: #f8f9fa; border-radius: 10px; padding: 25px; margin-bottom: 20px;">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                    <div style="width: 100%; max-width: 400px;">
+                        <label for="live_person_name" style="display: block; margin-bottom: 10px; font-weight: 600; color: #333;">Person Name:</label>
+                        <input type="text" id="live_person_name" name="live_person_name" placeholder="e.g. john" required
+                               style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: white; font-size: 1em;">
+                        <p style="font-size: 0.85em; color: #666; margin-top: 8px; text-align: center;">
+                            This name will be used to save the face dataset as <code>face_dataset/&lt;name&gt;_faces.npy</code>
+                        </p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button type="button" id="startCollectionBtn" class="btn-primary-large" style="max-width: 200px;">
+                            ▶️ Start Collection
+                        </button>
+                        <button type="button" id="stopCollectionBtn" class="btn-primary-large" style="max-width: 200px;" disabled>
+                            ⏹️ Stop & Save
+                        </button>
+                    </div>
+                    
+                    <div id="collectionStatusDisplay" style="width: 100%; text-align: center; padding: 10px; background: #e3f2fd; border-radius: 8px; display: none;">
+                        <p style="margin: 0; font-weight: 600; color: #1976d2;">
+                            <span id="collectionStatusText">Status: Not Active</span>
+                        </p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #666;">
+                            Collected: <span id="collectionCount">0</span> / <span id="collectionMax">120</span> images
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Video Feed Container -->
+            <div id="videoContainer" style="display: none; margin-top: 20px; background: #000; border-radius: 10px; padding: 10px; text-align: center;">
+                <div style="position: relative; display: inline-block; max-width: 100%;">
+                    <img id="liveCollectionVideo" src="" alt="Live Collection Video" 
+                         style="max-width: 100%; height: auto; border-radius: 8px; display: block;">
+                    <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 8px 15px; border-radius: 5px; font-weight: 600;">
+                        <span id="videoStatusText">Live Feed</span>
+                    </div>
+                </div>
+                <p style="color: #666; margin-top: 10px; font-size: 0.9em;">
+                    Left: Main Camera View | Right: Detected Face View
+                </p>
+            </div>
+            
+            <div id="collectionResult" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: #e8f5e9; color: #2e7d32; font-weight: 600;"></div>
+            <div id="collectionError" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: #ffebee; color: #c62828; font-weight: 600;"></div>
+            
+            <div id="uploadedFaces" style="margin-top: 30px;">
+                <h3 style="font-size: 1.3em; margin-bottom: 15px; color: #333;">Your Uploaded Faces</h3>
+                <div id="facesList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                    <!-- Faces will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-overview">
+            <h3>📊 System Overview</h3>
+            <div class="stats-overview-grid">
+                <div class="stat-item">
+                    <span class="stat-label">🔥 Fire Detection</span>
+                    <span class="stat-value">Active</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🔫 Weapon Detection</span>
+                    <span class="stat-value">Active</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">👤 Human Detection</span>
+                    <span class="stat-value">Active</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🐾 Animal Detection</span>
+                    <span class="stat-value">Active</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🚗 Vehicle Detection</span>
+                    <span class="stat-value">Active</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">🚗 Number Plate</span>
+                    <span class="stat-value">Active</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="dashboard-card feature-card fire">
+                <div class="card-icon">🔥</div>
+                <div class="card-title">Fire Detection</div>
+                <div class="card-description">
+                    Real-time fire and smoke detection using advanced AI models. 
+                    Detects fire hazards instantly for early warning.
+                </div>
+                <button class="card-button" onclick="window.open('{{ url_for('fire_detection') }}', 'fireDetection', 'width=1200,height=800,resizable=yes,scrollbars=yes')">
+                    View Fire Detection
+                </button>
+            </div>
+            
+            <div class="dashboard-card feature-card weapon">
+                <div class="card-icon">🔫</div>
+                <div class="card-title">Weapon Detection</div>
+                <div class="card-description">
+                    Advanced weapon detection system. Identifies knives and pistols 
+                    with high accuracy for security monitoring.
+                </div>
+                <button class="card-button" onclick="window.open('{{ url_for('weapon_detection') }}', 'weaponDetection', 'width=1200,height=800,resizable=yes,scrollbars=yes')">
+                    View Weapon Detection
+                </button>
+            </div>
+            
+            <div class="dashboard-card feature-card human">
+                <div class="card-icon">👤</div>
+                <div class="card-title">Human Detection</div>
+                <div class="card-description">
+                    Person detection and tracking system. Monitors human presence 
+                    in monitored areas for security purposes.
+                </div>
+                <button class="card-button" onclick="window.open('{{ url_for('human_detection') }}', 'humanDetection', 'width=1200,height=800,resizable=yes,scrollbars=yes')">
+                    View Human Detection
+                </button>
+            </div>
+            
+            <div class="dashboard-card feature-card animal">
+                <div class="card-icon">🐾</div>
+                <div class="card-title">Animal Detection</div>
+                <div class="card-description">
+                    Multi-species animal detection. Identifies various animals 
+                    including dogs, cats, birds, and more.
+                </div>
+                <button class="card-button" onclick="window.open('{{ url_for('animal_detection') }}', 'animalDetection', 'width=1200,height=800,resizable=yes,scrollbars=yes')">
+                    View Animal Detection
+                </button>
+            </div>
+            
+            <div class="dashboard-card feature-card vehicle">
+                <div class="card-icon">🚗</div>
+                <div class="card-title">Vehicle Detection</div>
+                <div class="card-description">
+                    Comprehensive vehicle detection system. Detects cars, trucks, 
+                    buses, motorcycles, and other vehicles.
+                </div>
+                <button class="card-button" onclick="window.open('{{ url_for('vehicle_detection') }}', 'vehicleDetection', 'width=1200,height=800,resizable=yes,scrollbars=yes')">
+                    View Vehicle Detection
+                </button>
+            </div>
+            
+            <div class="dashboard-card feature-card plate">
+                <div class="card-icon">🚗</div>
+                <div class="card-title">Number Plate Detection</div>
+                <div class="card-description">
+                    License plate detection and OCR recognition. Automatically 
+                    reads and extracts text from vehicle license plates.
+                </div>
+                <button class="card-button" onclick="window.open('{{ url_for('number_plate_detection') }}', 'plateDetection', 'width=1200,height=800,resizable=yes,scrollbars=yes')">
+                    View Number Plate Detection
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let collectionStatusInterval = null;
+        const videoElement = document.getElementById('liveCollectionVideo');
+        const videoContainer = document.getElementById('videoContainer');
+        const startBtn = document.getElementById('startCollectionBtn');
+        const stopBtn = document.getElementById('stopCollectionBtn');
+        const nameInput = document.getElementById('live_person_name');
+        const resultDiv = document.getElementById('collectionResult');
+        const errorDiv = document.getElementById('collectionError');
+        const statusDisplay = document.getElementById('collectionStatusDisplay');
+        const statusText = document.getElementById('collectionStatusText');
+        const collectionCount = document.getElementById('collectionCount');
+        const collectionMax = document.getElementById('collectionMax');
+        
+        // Start collection
+        startBtn.addEventListener('click', async function() {
+            if (!nameInput.value || !nameInput.value.trim()) {
+                errorDiv.textContent = 'Please enter a person name';
+                errorDiv.style.display = 'block';
+                resultDiv.style.display = 'none';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/start-live-collection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        person_name: nameInput.value.trim()
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    // Show video feed
+                    videoElement.src = '/live-collection-video-feed?' + new Date().getTime();
+                    videoContainer.style.display = 'block';
+                    statusDisplay.style.display = 'block';
+                    
+                    // Update UI
+                    startBtn.disabled = true;
+                    stopBtn.disabled = false;
+                    nameInput.disabled = true;
+                    
+                    // Start status polling
+                    startStatusPolling();
+                    
+                    errorDiv.style.display = 'none';
+                    resultDiv.style.display = 'none';
+                } else {
+                    errorDiv.textContent = data.error || 'Error starting collection';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.style.display = 'block';
+            }
+        });
+        
+        // Stop collection
+        stopBtn.addEventListener('click', async function() {
+            try {
+                stopBtn.disabled = true;
+                stopBtn.textContent = '⏳ Saving...';
+                
+                const response = await fetch('/stop-live-collection', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    // Stop video feed
+                    videoElement.src = '';
+                    videoContainer.style.display = 'none';
+                    statusDisplay.style.display = 'none';
+                    
+                    // Update UI
+                    startBtn.disabled = false;
+                    stopBtn.disabled = false;
+                    stopBtn.textContent = '⏹️ Stop & Save';
+                    nameInput.disabled = false;
+                    
+                    // Stop status polling
+                    stopStatusPolling();
+                    
+                    // Show result
+                    resultDiv.style.display = 'block';
+                    resultDiv.textContent = `Successfully collected ${data.count} face images for ${data.person_name}. Saved to: ${data.dataset_file}`;
+                    errorDiv.style.display = 'none';
+                } else {
+                    errorDiv.textContent = data.error || 'Error stopping collection';
+                    errorDiv.style.display = 'block';
+                    stopBtn.disabled = false;
+                    stopBtn.textContent = '⏹️ Stop & Save';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.style.display = 'block';
+                stopBtn.disabled = false;
+                stopBtn.textContent = '⏹️ Stop & Save';
+            }
+        });
+        
+        // Status polling function
+        function startStatusPolling() {
+            collectionStatusInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/get-collection-status');
+                    const data = await response.json();
+                    
+                    if (data.active) {
+                        statusText.textContent = `Collecting: ${data.person_name || 'Unknown'}`;
+                        collectionCount.textContent = data.count;
+                        collectionMax.textContent = data.max_samples;
+                        
+                        // Auto-stop if max samples reached
+                        if (data.count >= data.max_samples) {
+                            stopBtn.click();
+                        }
+                    } else {
+                        stopStatusPolling();
+                    }
+                } catch (error) {
+                    console.error('Error polling status:', error);
+            }
+            }, 500); // Poll every 500ms
+        }
+        
+        function stopStatusPolling() {
+            if (collectionStatusInterval) {
+                clearInterval(collectionStatusInterval);
+                collectionStatusInterval = null;
+            }
+        }
+        
+        // Load user faces
+        async function loadUserFaces() {
+            try {
+                const response = await fetch('/get-user-faces');
+                const data = await response.json();
+                
+                const facesList = document.getElementById('facesList');
+                
+                if (data.status === 'success' && data.faces.length > 0) {
+                    facesList.innerHTML = data.faces.map(face => {
+                        const timestamp = new Date(face.timestamp).toLocaleString();
+                        // Extract filename from path (works with both Windows and Unix paths)
+                        const filename = face.image_path.replace(/^.*[\\\/]/, '');
+                        return `
+                            <div style="background: white; border-radius: 8px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <img src="/user_faces/${filename}" alt="Face" style="width: 100%; height: 150px; object-fit: cover; border-radius: 6px; margin-bottom: 8px;">
+                                <p style="font-size: 0.8em; color: #666; margin: 0;">${timestamp}</p>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    facesList.innerHTML = '<p style="color: #666; grid-column: 1 / -1; text-align: center; padding: 20px;">No faces uploaded yet. Upload your first face image above!</p>';
+                }
+            } catch (error) {
+                console.error('Error loading faces:', error);
+            }
+        }
+        
+        // Load faces on page load
+        loadUserFaces();
+    </script>
+    
+</body>
+</html>

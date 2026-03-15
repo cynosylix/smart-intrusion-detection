@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Upload - Smart Intrusion Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header-left h1 {
+            font-size: 2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .upload-section {
+            margin-bottom: 40px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9fa;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            background: #e9ecef;
+            border-color: #764ba2;
+        }
+        
+        .upload-area.dragover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        #videoInput {
+            display: none;
+        }
+        
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .file-info.show {
+            display: block;
+        }
+        
+        .detection-section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .detection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .detection-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+        }
+        
+        .detection-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .detection-card.active {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+        
+        .detection-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .btn-process {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-process:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-process:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .progress-section.show {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f5e9;
+            border-radius: 10px;
+            border: 2px solid #4CAF50;
+        }
+        
+        .result-section.show {
+            display: block;
+        }
+        
+        .result-title {
+            font-size: 1.3em;
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .detection-summary {
+            margin-bottom: 20px;
+        }
+        
+        .summary-item {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .summary-item strong {
+            color: #667eea;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .error-message {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffebee;
+            border-radius: 10px;
+            border: 2px solid #f44336;
+            color: #c62828;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>📹 Video Upload & Detection</h1>
+                <p>Upload a video and select detection types to process</p>
+            </div>
+            <div class="header-right">
+                <a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
+            </div>
+        </div>
+        
+        <div class="main-card">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('videoInput').click()">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Click to upload or drag and drop</div>
+                    <div class="upload-hint">Supported formats: MP4, AVI, MOV, MKV, FLV, WMV, WEBM</div>
+                </div>
+                <input type="file" id="videoInput" accept="video/*">
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+            
+            <div class="detection-section">
+                <h2 class="section-title">Select Detection Types</h2>
+                <div class="detection-grid">
+                    <div class="detection-card" id="fireCard">
+                        <label class="detection-label">
+                            <span>🔥</span>
+                            <span>Fire Detection</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="fireToggle" name="fire">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="detection-card" id="weaponCard">
+                        <label class="detection-label">
+                            <span>🔫</span>
+                            <span>Weapon Detection</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="weaponToggle" name="weapon">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="detection-card" id="humanCard">
+                        <label class="detection-label">
+                            <span>👤</span>
+                            <span>Human Detection</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="humanToggle" name="human">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="detection-card" id="animalCard">
+                        <label class="detection-label">
+                            <span>🐾</span>
+                            <span>Animal Detection</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="animalToggle" name="animal">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="detection-card" id="vehicleCard">
+                        <label class="detection-label">
+                            <span>🚗</span>
+                            <span>Vehicle Detection</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="vehicleToggle" name="vehicle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="detection-card" id="plateCard">
+                        <label class="detection-label">
+                            <span>🚗</span>
+                            <span>Number Plate Detection</span>
+                        </label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="plateToggle" name="plate">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-process" id="processBtn" onclick="processVideo()" disabled>Process Video</button>
+            
+            <div class="progress-section" id="progressSection">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">Processing...</div>
+                </div>
+                <p style="text-align: center; color: #666;">Please wait while the video is being processed...</p>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <div class="result-title">✅ Video Processed Successfully!</div>
+                <div class="detection-summary" id="detectionSummary"></div>
+                <a href="#" class="download-btn" id="downloadBtn" download>Download Processed Video</a>
+            </div>
+            
+            <div class="error-message" id="errorMessage"></div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedFile = null;
+        
+        // File input change
+        document.getElementById('videoInput').addEventListener('change', function(e) {
+            handleFileSelect(e.target.files[0]);
+        });
+        
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+        
+        function handleFileSelect(file) {
+            if (!file) return;
+            
+            if (!file.type.startsWith('video/')) {
+                showError('Please select a valid video file');
+                return;
+            }
+            
+            selectedFile = file;
+            const fileInfo = document.getElementById('fileInfo');
+            fileInfo.innerHTML = `
+                <strong>Selected File:</strong> ${file.name}<br>
+                <strong>Size:</strong> ${(file.size / (1024 * 1024)).toFixed(2)} MB<br>
+                <strong>Type:</strong> ${file.type}
+            `;
+            fileInfo.classList.add('show');
+            
+            // Enable process button
+            document.getElementById('processBtn').disabled = false;
+            
+            // Hide previous results/errors
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+        
+        // Toggle detection cards
+        const toggles = ['fire', 'weapon', 'human', 'animal', 'vehicle', 'plate'];
+        toggles.forEach(type => {
+            const toggle = document.getElementById(type + 'Toggle');
+            const card = document.getElementById(type + 'Card');
+            
+            toggle.addEventListener('change', function() {
+                if (this.checked) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+        });
+        
+        function processVideo() {
+            if (!selectedFile) {
+                showError('Please select a video file first');
+                return;
+            }
+            
+            // Check if at least one detection is selected
+            const hasSelection = toggles.some(type => {
+                return document.getElementById(type + 'Toggle').checked;
+            });
+            
+            if (!hasSelection) {
+                showError('Please select at least one detection type');
+                return;
+            }
+            
+            // Show progress
+            document.getElementById('progressSection').classList.add('show');
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('processBtn').disabled = true;
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('video', selectedFile);
+            
+            toggles.forEach(type => {
+                const toggle = document.getElementById(type + 'Toggle');
+                if (toggle.checked) {
+                    formData.append(type, 'on');
+                }
+            });
+            
+            // Send request
+            fetch('/upload-video', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('progressSection').classList.remove('show');
+                
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    showResult(data);
+                }
+            })
+            .catch(error => {
+                document.getElementById('progressSection').classList.remove('show');
+                showError('An error occurred: ' + error.message);
+            })
+            .finally(() => {
+                document.getElementById('processBtn').disabled = false;
+            });
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+        
+        function showResult(data) {
+            const resultSection = document.getElementById('resultSection');
+            const summaryDiv = document.getElementById('detectionSummary');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            // Set download link
+            downloadBtn.href = data.video_url;
+            
+            // Build summary
+            let summaryHTML = '<strong>Detection Summary:</strong><br><br>';
+            const summary = data.detection_summary;
+            
+            if (summary.fire && summary.fire.detected) {
+                summaryHTML += `<div class="summary-item">🔥 Fire: ${summary.fire.count} detection(s)</div>`;
+            }
+            if (summary.weapon && summary.weapon.detected) {
+                summaryHTML += `<div class="summary-item">🔫 Weapon: ${summary.weapon.count} detection(s) - ${summary.weapon.types.join(', ')}</div>`;
+            }
+            if (summary.human && summary.human.detected) {
+                summaryHTML += `<div class="summary-item">👤 Human: ${summary.human.count} detection(s)</div>`;
+            }
+            if (summary.animal && summary.animal.detected) {
+                summaryHTML += `<div class="summary-item">🐾 Animal: ${summary.animal.count} detection(s) - ${summary.animal.types.join(', ')}</div>`;
+            }
+            if (summary.vehicle && summary.vehicle.detected) {
+                summaryHTML += `<div class="summary-item">🚗 Vehicle: ${summary.vehicle.count} detection(s) - ${summary.vehicle.types.join(', ')}</div>`;
+            }
+            if (summary.plate && summary.plate.detected) {
+                summaryHTML += `<div class="summary-item">🚗 Number Plate: ${summary.plate.count} detection(s) - ${summary.plate.texts.join(', ')}</div>`;
+            }
+            
+            if (summaryHTML === '<strong>Detection Summary:</strong><br><br>') {
+                summaryHTML += '<div class="summary-item">No detections found in the video.</div>';
+            }
+            
+            summaryDiv.innerHTML = summaryHTML;
+            resultSection.classList.add('show');
+        }
+    </script>
+</body>
+</html>

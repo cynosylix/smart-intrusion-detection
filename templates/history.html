@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection History - Smart Intrusion Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header-left h1 {
+            font-size: 2em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+        
+        .header-left p {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+        
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .history-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .history-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .history-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .history-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .history-info {
+            margin-bottom: 10px;
+        }
+        
+        .history-type {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .history-type.fire {
+            color: #f44336;
+        }
+        
+        .history-type.weapon {
+            color: #ff9800;
+        }
+        
+        .history-type.human {
+            color: #4CAF50;
+        }
+        
+        .history-type.animal {
+            color: #00bcd4;
+        }
+        
+        .history-type.vehicle {
+            color: #ffc107;
+        }
+        
+        .history-type.plate {
+            color: #9c27b0;
+        }
+        
+        .history-timestamp {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .history-details {
+            color: #555;
+            font-size: 0.85em;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .delete-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .delete-btn:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+        
+        .empty-state {
+            background: white;
+            border-radius: 15px;
+            padding: 60px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .empty-state h2 {
+            font-size: 2em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            color: #999;
+            font-size: 1.1em;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            cursor: pointer;
+        }
+        
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 50px;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: #bbb;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header-right {
+                margin-top: 15px;
+            }
+            
+            .history-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>📜 Detection History</h1>
+                <p>View all detected frames with timestamps</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span>👤 {{ username }}</span>
+                </div>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Dashboard</a>
+                <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+            </div>
+        </div>
+        
+        {% if history %}
+        <div class="history-grid">
+            {% for record in history %}
+            <div class="history-card">
+                <img src="{{ url_for('history_image', filename=record.frame_filename) }}" 
+                     alt="{{ record.detection_type }}" 
+                     class="history-image"
+                     onclick="openModal(this.src)">
+                <div class="history-info">
+                    <div class="history-type {{ record.detection_type }}">
+                        {% if record.detection_type == 'fire' %}🔥
+                        {% elif record.detection_type == 'weapon' %}🔫
+                        {% elif record.detection_type == 'human' %}👤
+                        {% elif record.detection_type == 'animal' %}🐾
+                        {% elif record.detection_type == 'vehicle' %}🚗
+                        {% elif record.detection_type == 'plate' %}🚗
+                        {% endif %}
+                        {{ record.detection_type|title }} Detection
+                    </div>
+                    <div class="history-timestamp">
+                        📅 {{ record.timestamp }}
+                    </div>
+                    {% if record.details %}
+                    <div class="history-details">
+                        {% if record.details.types %}
+                            <strong>Types:</strong> {{ record.details.types|join(', ') }}
+                        {% elif record.details.texts %}
+                            <strong>Plates:</strong> {{ record.details.texts|join(', ') }}
+                        {% elif record.details.count %}
+                            <strong>Count:</strong> {{ record.details.count }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                <button class="delete-btn" onclick="deleteHistory({{ record.id }})">🗑️ Delete</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>📭 No Detection History</h2>
+            <p>No detections have been recorded yet. Start detection to see history here.</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Modal for image viewing -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+    
+    <script>
+        function openModal(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = 'block';
+            modalImg.src = src;
+        }
+        
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        function deleteHistory(historyId) {
+            if (!confirm('Are you sure you want to delete this detection record?')) {
+                return;
+            }
+            
+            fetch(`/delete_history/${historyId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'deleted') {
+                    location.reload();
+                } else {
+                    alert('Error deleting record: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                alert('Error deleting record: ' + error.message);
+            });
+        }
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

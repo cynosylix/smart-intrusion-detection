@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Intrusion Detection System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e1e3f 0%, #2d2d5f 100%);
+            padding: 25px 35px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header-left h1 {
+            font-size: 2em;
+            color: #fff;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .header-left p {
+            font-size: 0.95em;
+            color: #ffffff;
+            margin: 8px 0 0 0;
+            font-weight: 300;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .dashboard-link, .logout-btn {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.9em;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            font-weight: 500;
+        }
+        
+        .dashboard-link:hover, .logout-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            color: #ffffff;
+        }
+        
+        .logout-btn {
+            color: #ffffff;
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: rgba(255, 107, 107, 0.5);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+            color: #ffffff;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .video-section {
+            background: linear-gradient(135deg, #1e1e3f 0%, #2d2d5f 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            animation: fadeInUp 0.7s ease-out 0.2s both;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .video-section h2 {
+            font-size: 1.4em;
+            color: #fff;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .video-section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .video-container:hover {
+            border-color: rgba(102, 126, 234, 0.6);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.3);
+        }
+        
+        .video-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .stats-section {
+            background: linear-gradient(135deg, #1e1e3f 0%, #2d2d5f 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            animation: fadeInUp 0.7s ease-out 0.4s both;
+        }
+        
+        .stats-section h2 {
+            color: #fff;
+            margin: 0 0 20px 0;
+            font-size: 1.4em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+        
+        .stat-card {
+            background: rgba(30, 30, 63, 0.6);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateX(5px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .stat-card:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .stat-card.active {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.15);
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        
+        .stat-card.active::before {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            transform: scaleY(1);
+        }
+        
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(244, 67, 54, 0.3); }
+            50% { box-shadow: 0 4px 30px rgba(244, 67, 54, 0.5); }
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stat-title {
+            font-size: 1.05em;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .stat-count {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #ffffff;
+            margin-right: 12px;
+            animation: countUp 0.5s ease-out;
+        }
+        
+        @keyframes countUp {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .stat-details {
+            font-size: 0.9em;
+            color: #ffffff;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            background: #4CAF50;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        .status-indicator.active {
+            background: #f44336;
+            box-shadow: 0 0 15px rgba(244, 67, 54, 0.8);
+            animation: pulseActive 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulseActive {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.3); }
+        }
+        
+        .alert-banner {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1em;
+            display: none;
+            box-shadow: 0 8px 24px rgba(244, 67, 54, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideInDown 0.5s ease-out, shake 0.5s ease-out 0.5s;
+        }
+        
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .alert-banner.show {
+            display: block;
+            animation: slideInDown 0.5s ease-out, shake 0.5s ease-out 0.5s, pulseGlow 2s ease-in-out infinite 1s;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 26px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 2px;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-color: rgba(76, 175, 80, 0.5);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .toggle-switch:hover .toggle-slider {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .toggle-switch input:checked + .toggle-slider:hover {
+            box-shadow: 0 0 25px rgba(76, 175, 80, 0.6);
+        }
+        
+        .stat-card.disabled {
+            opacity: 0.4;
+            background: rgba(20, 20, 40, 0.4);
+        }
+        
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>🛡️ Detection System</h1>
+                <p>Live Monitoring</p>
+            </div>
+            <div class="user-info">
+                <div style="display: flex; align-items: center; gap: 10px; margin-right: 10px;">
+                    <span style="color: #ffffff; font-size: 0.9em; font-weight: 500;">📧 Email Alerts:</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="emailToggle" onchange="toggleEmailNotifications()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <a href="{{ url_for('dashboard') }}" class="dashboard-link">Dashboard</a>
+                <span style="color: #ffffff;">{{ username }}</span>
+                <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            </div>
+        </div>
+        
+        <div class="alert-banner" id="alertBanner">
+            ⚠️ THREAT DETECTED! Check detection details below.
+        </div>
+        
+        <div class="main-content">
+            <div class="video-section">
+                <h2>Live Detection Feed</h2>
+                <div class="video-container">
+                    <img src="{{ url_for('video_feed') }}" alt="Video Feed" id="videoFeed">
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="startDetection()"><span>▶ Start</span></button>
+                    <button class="btn btn-danger" onclick="stopDetection()"><span>⏹ Stop</span></button>
+                    <button class="btn btn-secondary" onclick="resetStats()"><span>🔄 Reset</span></button>
+                </div>
+            </div>
+            
+            <div class="stats-section">
+                <h2>Detections</h2>
+                
+                <div class="stat-card" id="fireCard">
+                    <div class="stat-header">
+                        <span class="stat-title">🔥 Fire</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="stat-count" id="fireCount">0</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="fireToggle" onchange="toggleDetection('fire')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="stat-details">
+                        <span class="status-indicator" id="fireIndicator"></span>
+                        <span id="fireStatus">No fire detected</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card" id="weaponCard">
+                    <div class="stat-header">
+                        <span class="stat-title">🔫 Weapon</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="stat-count" id="weaponCount">0</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="weaponToggle" onchange="toggleDetection('weapon')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="stat-details">
+                        <span class="status-indicator" id="weaponIndicator"></span>
+                        <span id="weaponStatus">No weapons detected</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card" id="humanCard">
+                    <div class="stat-header">
+                        <span class="stat-title">👤 Human</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="humanToggle" onchange="toggleDetection('human')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="stat-details">
+                        <span class="status-indicator" id="humanIndicator"></span>
+                        <span id="humanStatus">No humans detected</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card" id="animalCard">
+                    <div class="stat-header">
+                        <span class="stat-title">🐾 Animal</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="stat-count" id="animalCount">0</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="animalToggle" onchange="toggleDetection('animal')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="stat-details">
+                        <span class="status-indicator" id="animalIndicator"></span>
+                        <span id="animalStatus">No animals detected</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card" id="vehicleCard">
+                    <div class="stat-header">
+                        <span class="stat-title">🚗 Vehicle</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="stat-count" id="vehicleCount">0</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="vehicleToggle" onchange="toggleDetection('vehicle')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="stat-details">
+                        <span class="status-indicator" id="vehicleIndicator"></span>
+                        <span id="vehicleStatus">No vehicles detected</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card" id="plateCard">
+                    <div class="stat-header">
+                        <span class="stat-title">🚗 Plate</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="stat-count" id="plateCount">0</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="plateToggle" onchange="toggleDetection('plate')">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="stat-details">
+                        <span class="status-indicator" id="plateIndicator"></span>
+                        <span id="plateStatus">No plates detected</span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let statsUpdateInterval;
+        
+        function updateStats() {
+            fetch('/stats')
+                .then(response => response.json())
+                .then(data => {
+                    // Fire
+                    document.getElementById('fireCount').textContent = data.fire.count;
+                    const fireCard = document.getElementById('fireCard');
+                    const fireIndicator = document.getElementById('fireIndicator');
+                    const fireStatus = document.getElementById('fireStatus');
+                    if (data.fire.detected) {
+                        fireCard.classList.add('active');
+                        fireIndicator.classList.add('active');
+                        fireStatus.textContent = '🔥 Fire detected!';
+                    } else {
+                        fireCard.classList.remove('active');
+                        fireIndicator.classList.remove('active');
+                        fireStatus.textContent = 'No fire detected';
+                    }
+                    
+                    // Weapon
+                    document.getElementById('weaponCount').textContent = data.weapon.count;
+                    const weaponCard = document.getElementById('weaponCard');
+                    const weaponIndicator = document.getElementById('weaponIndicator');
+                    const weaponStatus = document.getElementById('weaponStatus');
+                    if (data.weapon.detected) {
+                        weaponCard.classList.add('active');
+                        weaponIndicator.classList.add('active');
+                        weaponStatus.textContent = `⚠️ ${data.weapon.types.join(', ') || 'Weapons'} detected!`;
+                    } else {
+                        weaponCard.classList.remove('active');
+                        weaponIndicator.classList.remove('active');
+                        weaponStatus.textContent = 'No weapons detected';
+                    }
+                    
+                    // Human
+                    // Human count removed
+                    const humanCard = document.getElementById('humanCard');
+                    const humanIndicator = document.getElementById('humanIndicator');
+                    const humanStatus = document.getElementById('humanStatus');
+                    if (data.human.detected) {
+                        humanCard.classList.add('active');
+                        humanIndicator.classList.add('active');
+                        humanStatus.textContent = '👤 Humans detected';
+                    } else {
+                        humanCard.classList.remove('active');
+                        humanIndicator.classList.remove('active');
+                        humanStatus.textContent = 'No humans detected';
+                    }
+                    
+                    // Animal
+                    document.getElementById('animalCount').textContent = data.animal.count;
+                    const animalCard = document.getElementById('animalCard');
+                    const animalIndicator = document.getElementById('animalIndicator');
+                    const animalStatus = document.getElementById('animalStatus');
+                    if (data.animal.detected) {
+                        animalCard.classList.add('active');
+                        animalIndicator.classList.add('active');
+                        animalStatus.textContent = `🐾 ${data.animal.types.join(', ') || 'Animals'} detected`;
+                    } else {
+                        animalCard.classList.remove('active');
+                        animalIndicator.classList.remove('active');
+                        animalStatus.textContent = 'No animals detected';
+                    }
+                    
+                    // Vehicle
+                    document.getElementById('vehicleCount').textContent = data.vehicle.count;
+                    const vehicleCard = document.getElementById('vehicleCard');
+                    const vehicleIndicator = document.getElementById('vehicleIndicator');
+                    const vehicleStatus = document.getElementById('vehicleStatus');
+                    if (data.vehicle.detected) {
+                        vehicleCard.classList.add('active');
+                        vehicleIndicator.classList.add('active');
+                        vehicleStatus.textContent = `🚗 ${data.vehicle.types.join(', ') || 'Vehicles'} detected`;
+                    } else {
+                        vehicleCard.classList.remove('active');
+                        vehicleIndicator.classList.remove('active');
+                        vehicleStatus.textContent = 'No vehicles detected';
+                    }
+                    
+                    // Plate
+                    document.getElementById('plateCount').textContent = data.plate.count;
+                    const plateCard = document.getElementById('plateCard');
+                    const plateIndicator = document.getElementById('plateIndicator');
+                    const plateStatus = document.getElementById('plateStatus');
+                    if (data.plate.detected) {
+                        plateCard.classList.add('active');
+                        plateIndicator.classList.add('active');
+                        plateStatus.textContent = `🚗 Plates: ${data.plate.texts.join(', ') || 'Detected'}`;
+                    } else {
+                        plateCard.classList.remove('active');
+                        plateIndicator.classList.remove('active');
+                        plateStatus.textContent = 'No plates detected';
+                    }
+                    
+                    // Show alert if any threat detected
+                    const alertBanner = document.getElementById('alertBanner');
+                    if (data.fire.detected || data.weapon.detected) {
+                        alertBanner.classList.add('show');
+                    } else {
+                        alertBanner.classList.remove('show');
+                    }
+                })
+                .catch(error => console.error('Error fetching stats:', error));
+        }
+        
+        function startDetection() {
+            fetch('/start')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Detection started');
+                    statsUpdateInterval = setInterval(updateStats, 1000);
+                });
+        }
+        
+        function stopDetection() {
+            fetch('/stop')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Detection stopped');
+                    if (statsUpdateInterval) {
+                        clearInterval(statsUpdateInterval);
+                    }
+                });
+        }
+        
+        function resetStats() {
+            fetch('/reset')
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Stats reset');
+                    updateStats();
+                });
+        }
+        
+        function toggleDetection(detectionType) {
+            const toggle = document.getElementById(detectionType + 'Toggle');
+            const card = document.getElementById(detectionType + 'Card');
+            
+            fetch('/toggle_detection/' + detectionType, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Detection toggled:', data);
+                if (data.enabled) {
+                    card.classList.remove('disabled');
+                } else {
+                    card.classList.add('disabled');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling detection:', error);
+                // Revert toggle on error
+                toggle.checked = !toggle.checked;
+            });
+        }
+        
+        // Load detection status on page load
+        function loadDetectionStatus() {
+            fetch('/detection_status')
+                .then(response => response.json())
+                .then(data => {
+                    Object.keys(data).forEach(detectionType => {
+                        const toggle = document.getElementById(detectionType + 'Toggle');
+                        const card = document.getElementById(detectionType + 'Card');
+                        if (toggle) {
+                            toggle.checked = data[detectionType];
+                            if (!data[detectionType]) {
+                                card.classList.add('disabled');
+                            } else {
+                                card.classList.remove('disabled');
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading detection status:', error);
+                });
+        }
+        
+        // Email notification functions
+        function toggleEmailNotifications() {
+            const toggle = document.getElementById('emailToggle');
+            fetch('/toggle_email_notifications', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Email notifications:', data.enabled ? 'ON' : 'OFF');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling email notifications:', error);
+                toggle.checked = !toggle.checked;
+            });
+        }
+        
+        function loadEmailNotificationStatus() {
+            fetch('/email_notifications_status')
+                .then(response => response.json())
+                .then(data => {
+                    const toggle = document.getElementById('emailToggle');
+                    if (toggle) {
+                        toggle.checked = data.enabled;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading email notification status:', error);
+                });
+        }
+        
+        // Auto-start detection and update stats
+        window.onload = function() {
+            loadDetectionStatus();
+            loadEmailNotificationStatus();
+            startDetection();
+            updateStats();
+        };
+        
+        // Stop camera when leaving the page
+        window.addEventListener('beforeunload', function() {
+            // Use sendBeacon for reliable delivery even when page is unloading
+            navigator.sendBeacon('/stop-camera');
+            stopDetection();
+        });
+        
+        // Also stop camera when page becomes hidden (user navigates away)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                fetch('/stop-camera', {method: 'POST'})
+                    .catch(err => console.log('Error stopping camera:', err));
+                stopDetection();
+            }
+        });
+    </script>
+</body>
+</html>
